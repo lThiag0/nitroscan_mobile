@@ -30,12 +30,18 @@
 ## 🖼️ Imagens do App
 
 <p align="center">
-  <img src="assets/screenshots/home.png" alt="Tela Inicial" width="200"/>
-  <img src="assets/screenshots/ean_scanner.png" alt="Leitor de Codigo EAN" width="200"/>
-  <img src="assets/screenshots/etiquetas.png" alt="Etiquetas" width="200"/>
-  <img src="assets/screenshots/produto.png" alt="Tela de Cadastro de Produto" width="200"/>
+  <img src="assets/screenshots/Home.jpeg" alt="Tela Inicial" width="200"/>
+  <img src="assets/screenshots/escanenadoProdutos.jpeg" alt="Leitor de Codigo EAN" width="200"/>
+  <img src="assets/screenshots/cadastraproduto.jpeg" alt="Etiquetas" width="200"/>
+  <img src="assets/screenshots/cadastroP.jpeg" alt="Tela de Cadastro de Produto" width="200"/>
+  <img src="assets/screenshots/buscaproduto.jpeg" alt="Tela de Busca Produto" width="200"/>
+  <img src="assets/screenshots/cadastroImg.jpeg" alt="Tela de Cadastro de Produto Imagem" width="200"/>
+  <img src="assets/screenshots/produtoEscaneado.jpeg" alt="Tela de Escaneamento" width="200"/>
+  <img src="assets/screenshots/login.jpeg" alt="Tela de Login" width="200"/>
+  <img src="assets/screenshots/info.jpeg" alt="Tela de Info" width="200"/>
+  <img src="assets/screenshots/produtos.jpeg" alt="Tela de Escaneamento de codigos" width="200"/>
+  <img src="assets/screenshots/editarProduto.jpeg" alt="Tela de Editar Produto" width="200"/>
   <br/>
-  <em>Telas: Home       •       Scanner de Codigo EAN       •       Etiquetas       •       Cadastro de Produtos</em>
 </p>
 
 ---
@@ -45,7 +51,7 @@
 Veja como o app funciona assistindo ao vídeo abaixo:
 
 <a href="\" target="_blank">
-  <img src="assets/screenshots/home.png" alt="Demonstração do Nitro app" width="100"/>
+  <img src="assets/screenshots/Home.jpeg" alt="Demonstração do Nitro app" width="100"/>
 </a>
 
 Clique na imagem acima para assistir ao vídeo de demonstração do Nitro.
