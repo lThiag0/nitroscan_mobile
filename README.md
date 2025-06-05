@@ -10,6 +10,12 @@
 
 ---
 
+## 🌐 NitroScan Web
+
+<a href="https://github.com/lThiag0/nitroScan" alt="NitroScan Web API" target="_blank">NitroScan Web API</a>
+
+---
+
 ## 📱 Baixe o aplicativo
 
 <a href="/">Baixe aqui</a>
