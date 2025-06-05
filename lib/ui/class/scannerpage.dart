@@ -29,6 +29,35 @@ class _ScannerSimplesPageState extends State<ScannerSimplesPage> {
     cameraController.toggleTorch();
   }
 
+  bool validarEAN(String codigo) {
+    if (codigo.length != 13 && codigo.length != 8) return false;
+
+    final digits = codigo.split('').map(int.tryParse).toList();
+    if (digits.contains(null)) return false;
+
+    final int length = codigo.length;
+    final int checkDigit = digits.removeLast()!;
+
+    int sum = 0;
+    for (int i = 0; i < digits.length; i++) {
+      int weight = (length == 13)
+          ? (i % 2 == 0 ? 1 : 3)
+          : (i % 2 == 0 ? 3 : 1); // EAN-13 / EAN-8 diferente
+      sum += digits[i]! * weight;
+    }
+
+    int calculatedDigit = (10 - (sum % 10)) % 10;
+    return checkDigit == calculatedDigit;
+  }
+
+  void _processarCodigo(String codigo) {
+    if (validarEAN(codigo)) {
+      Navigator.pop(context, codigo);
+    } else {
+      setState(() => _codigoLido = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,10 +91,8 @@ class _ScannerSimplesPageState extends State<ScannerSimplesPage> {
 
           if (codigo != null) {
             setState(() => _codigoLido = true);
-
             Future.delayed(const Duration(milliseconds: 200), () {
-              // ignore: use_build_context_synchronously
-              Navigator.pop(context, codigo);
+              _processarCodigo(codigo);
             });
           }
         },

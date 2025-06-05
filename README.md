@@ -85,8 +85,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [MIT](./LICENSE) para mais
 - Crie o Arquivo .env com API_URL=
 
 ```bash
-1. git clone https://github.com/lThiag0/nitro.git
-cd globo_nitro
+1. git clone https://github.com/lThiag0/nitroscan_mobile.git
+cd nitroscan_mobile
 
 2. Instale as dependências:
 flutter pub get

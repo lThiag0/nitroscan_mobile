@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nitroscanmobile/ui/class/scancamera.dart';
@@ -27,7 +26,6 @@ class _ProdutosPageState extends State<ProdutosPage> {
   @override
   void initState() {
     super.initState();
-
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         _moverCursorParaUltimaLinha();
@@ -48,26 +46,16 @@ class _ProdutosPageState extends State<ProdutosPage> {
     );
   }
 
-  //buscar usuário
   Future<void> buscarUsuario() async {
     final nome = await authService.buscarUsuario(context);
-    if (nome != null) {
-      setState(() {
-        nomeUsuario = nome;
-      });
-    } else {
-      setState(() {
-        nomeUsuario = 'Usuário';
-      });
-    }
+    setState(() {
+      nomeUsuario = nome ?? 'Usuário';
+    });
   }
 
-  //logout
   void logout() async {
     setState(() => _isLoggingOut = true);
-
     await authService.logout(context);
-
     setState(() => _isLoggingOut = false);
   }
 
@@ -132,16 +120,32 @@ class _ProdutosPageState extends State<ProdutosPage> {
       return;
     }
 
-    final novosCodigos = codigoController.text
-        .split('\n')
-        .map((e) => e.trim().replaceAll(',', ''))
-        .where((e) => e.isNotEmpty)
-        .toList();
+    final novosCodigos = {
+      ...codigoController.text
+          .split('\n')
+          .map((e) => e.trim().replaceAll(',', ''))
+          .where((e) => e.isNotEmpty)
+    }.toList();
 
     if (novosCodigos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Nenhum código válido foi encontrado.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final codigosInvalidos = novosCodigos
+        .where((codigo) => !RegExp(r'^\d+$').hasMatch(codigo))
+        .toList();
+
+    if (codigosInvalidos.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Há códigos inválidos (com letras ou símbolos): ${codigosInvalidos.join(', ')}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -212,9 +216,17 @@ class _ProdutosPageState extends State<ProdutosPage> {
     if (confirmado != true) return;
 
     final url = Uri.parse('${widget.baseUrl}api/limpar-eans');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
 
     try {
-      final response = await http.delete(url);
+      final response = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         setState(() {
@@ -257,29 +269,27 @@ class _ProdutosPageState extends State<ProdutosPage> {
         ),
         actions: [
           _isLoggingOut
-          ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: Icon(Icons.logout, color: Colors.white),
+                  onPressed: logout,
                 ),
-              ),
-            )
-          : IconButton(
-              icon: Icon(Icons.logout, color: Colors.white),
-              onPressed: logout,
-            ),
         ],
         backgroundColor: const Color.fromARGB(255, 20, 121, 189),
         elevation: 0,
       ),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
+          ? Center(child: CircularProgressIndicator())
           : Stack(
               children: [
                 Positioned(
@@ -304,15 +314,13 @@ class _ProdutosPageState extends State<ProdutosPage> {
                 ),
                 Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 32.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Escaneie ou digite o código de barras:',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
@@ -323,43 +331,30 @@ class _ProdutosPageState extends State<ProdutosPage> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () async {
-                                    final codigosEscaneados =
-                                        await Navigator.push<List<String>>(
+                                    final codigosEscaneados = await Navigator.push<List<String>>(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ScannerPage(),
-                                      ),
+                                      MaterialPageRoute(builder: (context) => ScannerPage()),
                                     );
 
-                                    if (codigosEscaneados != null &&
-                                        codigosEscaneados.isNotEmpty) {
+                                    if (codigosEscaneados != null && codigosEscaneados.isNotEmpty) {
                                       setState(() {
                                         for (var codigo in codigosEscaneados) {
-                                          final textoAtual =
-                                              codigoController.text.trimRight();
+                                          final textoAtual = codigoController.text.trimRight();
                                           final novoTexto = textoAtual.isEmpty
                                               ? '$codigo,\n'
                                               : '$textoAtual\n$codigo,\n';
                                           codigoController.text = novoTexto;
-                                          codigoController.selection =
-                                              TextSelection.fromPosition(
-                                            TextPosition(
-                                                offset:
-                                                    codigoController.text.length),
+                                          codigoController.selection = TextSelection.fromPosition(
+                                            TextPosition(offset: codigoController.text.length),
                                           );
                                         }
                                       });
                                     }
                                   },
-                                  icon: Icon(Icons.qr_code_scanner,
-                                      color: Colors.white),
-                                  label: Text(
-                                    'Scan Câmera',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  icon: Icon(Icons.qr_code_scanner, color: Colors.white),
+                                  label: Text('Scan Câmera', style: TextStyle(color: Colors.white)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 20, 121, 189),
+                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
                                     minimumSize: Size(double.infinity, 50),
                                   ),
                                 ),
@@ -368,15 +363,10 @@ class _ProdutosPageState extends State<ProdutosPage> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: buscarCodigos,
-                                  icon: Icon(Icons.refresh_outlined,
-                                      color: Colors.white),
-                                  label: Text(
-                                    'Recarregar',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  icon: Icon(Icons.refresh_outlined, color: Colors.white),
+                                  label: Text('Recarregar', style: TextStyle(color: Colors.white)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 20, 121, 189),
+                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
                                     minimumSize: Size(double.infinity, 50),
                                   ),
                                 ),
@@ -408,13 +398,9 @@ class _ProdutosPageState extends State<ProdutosPage> {
                                 child: ElevatedButton.icon(
                                   onPressed: limparCodigosApi,
                                   icon: Icon(Icons.clear, color: Colors.white),
-                                  label: Text(
-                                    'Limpar',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  label: Text('Limpar', style: TextStyle(color: Colors.white)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 247, 65, 65),
+                                    backgroundColor: Color.fromARGB(255, 247, 65, 65),
                                     minimumSize: Size(double.infinity, 50),
                                   ),
                                 ),
@@ -424,13 +410,9 @@ class _ProdutosPageState extends State<ProdutosPage> {
                                 child: ElevatedButton.icon(
                                   onPressed: salvarCodigo,
                                   icon: Icon(Icons.save, color: Colors.white),
-                                  label: Text(
-                                    'Salvar',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  label: Text('Salvar', style: TextStyle(color: Colors.white)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 20, 121, 189),
+                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
                                     minimumSize: Size(double.infinity, 50),
                                   ),
                                 ),

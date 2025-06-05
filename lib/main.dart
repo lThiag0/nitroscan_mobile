@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nitroscanmobile/ui/buscarproduto.dart';
 import 'package:nitroscanmobile/ui/loginpage.dart';
 import 'package:nitroscanmobile/ui/home.dart';
@@ -8,7 +9,14 @@ import 'package:nitroscanmobile/ui/tela.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); 
   await dotenv.load(fileName: ".env");
+
+  // Trava a orientação da tela em retrato
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   runApp(MyApp());
 }
 
