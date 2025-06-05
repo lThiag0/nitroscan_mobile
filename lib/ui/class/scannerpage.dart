@@ -30,24 +30,25 @@ class _ScannerSimplesPageState extends State<ScannerSimplesPage> {
   }
 
   bool validarEAN(String codigo) {
-    if (codigo.length != 13 && codigo.length != 8) return false;
+    if (!RegExp(r'^\d+$').hasMatch(codigo)) return false;
+    if (codigo.length != 8 && codigo.length != 13) return false;
 
-    final digits = codigo.split('').map(int.tryParse).toList();
-    if (digits.contains(null)) return false;
-
-    final int length = codigo.length;
-    final int checkDigit = digits.removeLast()!;
+    final digits = codigo.split('').map(int.parse).toList();
+    final checkDigit = digits.removeLast();
 
     int sum = 0;
     for (int i = 0; i < digits.length; i++) {
-      int weight = (length == 13)
-          ? (i % 2 == 0 ? 1 : 3)
-          : (i % 2 == 0 ? 3 : 1); // EAN-13 / EAN-8 diferente
-      sum += digits[i]! * weight;
+      int weight;
+      if (codigo.length == 13) {
+        weight = (i % 2 == 0) ? 1 : 3;
+      } else {
+        weight = (i % 2 == 0) ? 3 : 1;
+      }
+      sum += digits[i] * weight;
     }
 
-    int calculatedDigit = (10 - (sum % 10)) % 10;
-    return checkDigit == calculatedDigit;
+    int expectedCheckDigit = (10 - (sum % 10)) % 10;
+    return checkDigit == expectedCheckDigit;
   }
 
   void _processarCodigo(String codigo) {
