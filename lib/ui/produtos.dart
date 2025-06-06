@@ -120,12 +120,13 @@ class _ProdutosPageState extends State<ProdutosPage> {
       return;
     }
 
-    final novosCodigos = {
-      ...codigoController.text
-          .split('\n')
-          .map((e) => e.trim().replaceAll(',', ''))
-          .where((e) => e.isNotEmpty)
-    }.toList();
+    final novosCodigos =
+        {
+          ...codigoController.text
+              .split('\n')
+              .map((e) => e.trim().replaceAll(',', ''))
+              .where((e) => e.isNotEmpty),
+        }.toList();
 
     if (novosCodigos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -137,15 +138,17 @@ class _ProdutosPageState extends State<ProdutosPage> {
       return;
     }
 
-    final codigosInvalidos = novosCodigos
-        .where((codigo) => !RegExp(r'^\d+$').hasMatch(codigo))
-        .toList();
+    final codigosInvalidos =
+        novosCodigos
+            .where((codigo) => !RegExp(r'^\d+$').hasMatch(codigo))
+            .toList();
 
     if (codigosInvalidos.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Há códigos inválidos (com letras ou símbolos): ${codigosInvalidos.join(', ')}'),
+            'Há códigos inválidos (com letras ou símbolos): ${codigosInvalidos.join(', ')}',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -186,9 +189,9 @@ class _ProdutosPageState extends State<ProdutosPage> {
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro de conexão: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro de conexão: $e')));
     }
 
     setState(() {});
@@ -197,20 +200,23 @@ class _ProdutosPageState extends State<ProdutosPage> {
   Future<void> limparCodigosApi() async {
     final confirmado = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar limpeza'),
-        content: const Text('Tem certeza que deseja apagar todos os códigos?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirmar limpeza'),
+            content: const Text(
+              'Tem certeza que deseja apagar todos os códigos?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Limpar'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Limpar'),
-          ),
-        ],
-      ),
     );
 
     if (confirmado != true) return;
@@ -240,14 +246,16 @@ class _ProdutosPageState extends State<ProdutosPage> {
       } else {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Falha ao remover códigos: ${response.statusCode}')),
+          SnackBar(
+            content: Text('Falha ao remover códigos: ${response.statusCode}'),
+          ),
         );
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro na conexão: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro na conexão: $e')));
     }
   }
 
@@ -262,7 +270,10 @@ class _ProdutosPageState extends State<ProdutosPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(nomeUsuario ?? 'Carregando...', style: TextStyle(color: Colors.white)),
+        title: Text(
+          nomeUsuario ?? 'Carregando...',
+          style: TextStyle(color: Colors.white),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -270,162 +281,225 @@ class _ProdutosPageState extends State<ProdutosPage> {
         actions: [
           _isLoggingOut
               ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5,
                   ),
-                )
-              : IconButton(
-                  icon: Icon(Icons.logout, color: Colors.white),
-                  onPressed: logout,
                 ),
+              )
+              : IconButton(
+                icon: Icon(Icons.logout, color: Colors.white),
+                onPressed: logout,
+              ),
         ],
         backgroundColor: const Color.fromARGB(255, 20, 121, 189),
         elevation: 0,
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  child: Image.asset(
-                    'assets/image/ondaDeBaixo.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  child: Image.asset(
-                    'assets/image/ondaDeCima.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Center(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Escaneie ou digite o código de barras:',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 20),
-                        SizedBox(
-                          width: 350,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () async {
-                                    final codigosEscaneados = await Navigator.push<List<String>>(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => ScannerPage()),
-                                    );
-
-                                    if (codigosEscaneados != null && codigosEscaneados.isNotEmpty) {
-                                      setState(() {
-                                        for (var codigo in codigosEscaneados) {
-                                          final textoAtual = codigoController.text.trimRight();
-                                          final novoTexto = textoAtual.isEmpty
-                                              ? '$codigo,\n'
-                                              : '$textoAtual\n$codigo,\n';
-                                          codigoController.text = novoTexto;
-                                          codigoController.selection = TextSelection.fromPosition(
-                                            TextPosition(offset: codigoController.text.length),
-                                          );
-                                        }
-                                      });
-                                    }
-                                  },
-                                  icon: Icon(Icons.qr_code_scanner, color: Colors.white),
-                                  label: Text('Scan Câmera', style: TextStyle(color: Colors.white)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
-                                    minimumSize: Size(double.infinity, 50),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 20),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: buscarCodigos,
-                                  icon: Icon(Icons.refresh_outlined, color: Colors.white),
-                                  label: Text('Recarregar', style: TextStyle(color: Colors.white)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
-                                    minimumSize: Size(double.infinity, 50),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        SizedBox(
-                          width: 350,
-                          child: TextField(
-                            controller: codigoController,
-                            focusNode: focusNode,
-                            maxLines: 10,
-                            decoration: InputDecoration(
-                              hintText: 'Código de barras...',
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        SizedBox(
-                          width: 350,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: limparCodigosApi,
-                                  icon: Icon(Icons.clear, color: Colors.white),
-                                  label: Text('Limpar', style: TextStyle(color: Colors.white)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromARGB(255, 247, 65, 65),
-                                    minimumSize: Size(double.infinity, 50),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 20),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: salvarCodigo,
-                                  icon: Icon(Icons.save, color: Colors.white),
-                                  label: Text('Salvar', style: TextStyle(color: Colors.white)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 20, 121, 189),
-                                    minimumSize: Size(double.infinity, 50),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+      body:
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Stack(
+                children: [
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 100,
+                    child: Image.asset(
+                      'assets/image/ondaDeBaixo.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-              ],
-            ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 100,
+                    child: Image.asset(
+                      'assets/image/ondaDeCima.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0,
+                        vertical: 32.0,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Escaneie ou digite o código de barras:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: 350,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () async {
+                                      final codigosEscaneados =
+                                          await Navigator.push<List<String>>(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => ScannerPage(),
+                                            ),
+                                          );
+
+                                      if (codigosEscaneados != null &&
+                                          codigosEscaneados.isNotEmpty) {
+                                        setState(() {
+                                          for (var codigo
+                                              in codigosEscaneados) {
+                                            final textoAtual =
+                                                codigoController.text
+                                                    .trimRight();
+                                            final novoTexto =
+                                                textoAtual.isEmpty
+                                                    ? '$codigo,\n'
+                                                    : '$textoAtual\n$codigo,\n';
+                                            codigoController.text = novoTexto;
+                                            codigoController.selection =
+                                                TextSelection.fromPosition(
+                                                  TextPosition(
+                                                    offset:
+                                                        codigoController
+                                                            .text
+                                                            .length,
+                                                  ),
+                                                );
+                                          }
+                                        });
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.qr_code_scanner,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      'Câmera',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(
+                                        255,
+                                        20,
+                                        121,
+                                        189,
+                                      ),
+                                      minimumSize: Size(double.infinity, 50),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: buscarCodigos,
+                                    icon: Icon(
+                                      Icons.refresh_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      'Recarregar',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(
+                                        255,
+                                        20,
+                                        121,
+                                        189,
+                                      ),
+                                      minimumSize: Size(double.infinity, 50),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          SizedBox(
+                            width: 350,
+                            child: TextField(
+                              controller: codigoController,
+                              focusNode: focusNode,
+                              maxLines: 10,
+                              decoration: InputDecoration(
+                                hintText: 'Código de barras...',
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          SizedBox(
+                            width: 350,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: limparCodigosApi,
+                                    icon: Icon(
+                                      Icons.clear,
+                                      color: Colors.white,
+                                    ),
+                                    label: Text(
+                                      'Limpar',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color.fromARGB(
+                                        255,
+                                        247,
+                                        65,
+                                        65,
+                                      ),
+                                      minimumSize: Size(double.infinity, 50),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: salvarCodigo,
+                                    icon: Icon(Icons.save, color: Colors.white),
+                                    label: Text(
+                                      'Salvar',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(
+                                        255,
+                                        20,
+                                        121,
+                                        189,
+                                      ),
+                                      minimumSize: Size(double.infinity, 50),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 }
